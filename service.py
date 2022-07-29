@@ -7,7 +7,7 @@ DATA_DIR = os.environ.get('DATA_DIR', "/var/data")
 
 def create_webtorrent_files(file: str) -> None:
     torrent_path = os.path.join(file + ".torrent")
-    magnet_path = os.path.join(torrent_path + ".magnet")
+    magnet_path = os.path.join(torrent_path + ".magnet.txt")
     if not os.path.exists(torrent_path):
         cmd = f'webtorrent-hybrid create "{file}" -o "{torrent_path}"'
         print(f"Running: {cmd}")
@@ -37,23 +37,22 @@ def create_webtorrent_files(file: str) -> None:
 
 def make_index_html() -> None:
     # Scan DATA_DIR for movie files
+    os.chdir(DATA_DIR)
     html_str = "<html><body><ul>"
-    files = [os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR)]
+    files = [os.path.join(DATA_DIR, f) for f in os.listdir()]
     files = [
         f for f in files if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
     ]
     for file in files:
         try:
             create_webtorrent_files(file)
+            html_str += f'<li><a href="{file}">{file}</a></li>'
         except Exception as e:
             print(f"Failed to create webtorrent files for {file}: {e}")
             continue
-    for file in files:
-        # Make a link to the movie
-        html_str += f'<li><a href="{file}">{file}</a></li>'
     html_str += "</ul></body></html>"
     # Write the HTML file
-    index_html = os.path.join(DATA_DIR, "_index.html")
+    index_html = "_index.html"
     print(f"Writing {index_html}")
     with open(index_html, "w") as f:
         f.write(html_str)
