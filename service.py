@@ -7,7 +7,7 @@ DATA_DIR = "/var/data"
 
 def create_webtorrent_files(file: str) -> None:
     torrent_path = os.path.join(DATA_DIR, file + ".torrent")
-    magnet_path = os.path.join(DATA_DIR, file + ".magnet")
+    magnet_path = os.path.join(torrent_path + ".magnet")
     if not os.path.exists(torrent_path):
         cmd = f"webtorrent-hybrid create {file} -o {file}.torrent"
         print(f"Running: {cmd}")
@@ -42,10 +42,11 @@ def make_index_html() -> None:
     files = [
         f for f in files if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
     ]
-    for f in files:
-        create_webtorrent_files(f)
+    for file in files:
+      create_webtorrent_files(file)
+    for file in files:
         # Make a link to the movie
-        html_str += f'<li><a href="{f}">{f}</a></li>'
+        html_str += f'<li><a href="{file}">{file}</a></li>'
     html_str += "</ul></body></html>"
     # Write the HTML file
     index_html = os.path.join(DATA_DIR, "_index.html")
