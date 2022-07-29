@@ -55,9 +55,8 @@ def make_index_html() -> None:
 
 
 def main() -> int:
-    while True:
-        make_index_html()
-        time.sleep(5)
+    make_index_html()
+
 
 
 if __name__ == "__main__":
