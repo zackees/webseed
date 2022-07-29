@@ -1,14 +1,7 @@
-FROM ubuntu:16.04
-
-RUN apt-get update
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-
-RUN apt-get update
-RUN apt-get install -y nodejs
-RUN npm install -g http-server
-
-# Add additional tools
-RUN apt-get install -y nano links git wget curl htop
-
+FROM node:18
+WORKDIR /app
+RUN npm install -g node-pre-gyp webtorrent-cli webtorrent-hybrid http-server
+EXPOSE 80
+COPY . .
+# CMD ["/bin/sh", "./run.sh"]
 CMD http-server . -p 80 --cors='*'
