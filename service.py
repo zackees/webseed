@@ -102,7 +102,7 @@ HTML_TEMPLATE = """
 def create_webtorrent_files(file: str) -> None:
     torrent_path = os.path.join(file + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet.txt")
-    html_path = os.path.join(file + ".html")
+    html_path = os.path.join(torrent_path + ".html")
     if not os.path.exists(torrent_path):
         cmd = f'webtorrent-hybrid create "{file}" -o "{torrent_path}"'
         print(f"Running: {cmd}")
