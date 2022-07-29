@@ -37,9 +37,10 @@ RUN apt-get install -y \
     libnss3 \
     xvfb \
     git \
-    make gcc g++ nodejs npm
+    make gcc g++ nodejs npm nano
 
 RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server pm2 -g
+RUN pip install magic-wormhole
 
 # Still work in progress.
 

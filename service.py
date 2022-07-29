@@ -9,12 +9,13 @@ def create_webtorrent_files(file: str) -> None:
     torrent_path = os.path.join(file + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet")
     if not os.path.exists(torrent_path):
-        cmd = f"webtorrent-hybrid create {file} -o {file}.torrent"
+        cmd = f'webtorrent-hybrid create "{file}" -o "{torrent_path}"'
         print(f"Running: {cmd}")
         os.system(cmd)
+        assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"
     if not os.path.exists(magnet_path):
         # Now create the magnet file
-        cmd = f"webtorrent-hybrid seed {file} -q"
+        cmd = f'webtorrent-hybrid seed "{file}" -q'
         print(f"Running: {cmd}")
         proc = subprocess.Popen(
             cmd,
@@ -29,10 +30,9 @@ def create_webtorrent_files(file: str) -> None:
         print(f"Got magnet url: {magneturi}")
         proc.kill()
         # Write the magnet file
-        with open(f"{file}.magnet", "w") as f:
+        with open(magnet_path, "w") as f:
             f.write(magneturi)
-    assert os.path.exists(torrent_path), f"Missing {torrent_path}"
-    assert os.path.exists(magnet_path), f"Missing {magnet_path}"
+        assert os.path.exists(magnet_path), f"Missing {magnet_path}"
 
 
 def make_index_html() -> None:
@@ -43,7 +43,11 @@ def make_index_html() -> None:
         f for f in files if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
     ]
     for file in files:
-      create_webtorrent_files(file)
+        try:
+            create_webtorrent_files(file)
+        except Exception as e:
+            print(f"Failed to create webtorrent files for {file}: {e}")
+            continue
     for file in files:
         # Make a link to the movie
         html_str += f'<li><a href="{file}">{file}</a></li>'
