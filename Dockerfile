@@ -78,7 +78,7 @@ EXPOSE 80
 
 #run apt-get install -y python
 
-RUN npm install -g node-pre-gyp webtorrent-cli webtorrent-hybrid http-server
+# RUN npm install -g node-pre-gyp webtorrent-cli webtorrent-hybrid http-server
 EXPOSE 80
 COPY . .
 CMD ["/bin/sh", "./run.sh"]
