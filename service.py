@@ -35,11 +35,11 @@ def create_webtorrent_files(file: str) -> None:
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
 
 
-def make_index_html() -> None:
+def main() -> int:
     # Scan DATA_DIR for movie files
     os.chdir(DATA_DIR)
     html_str = "<html><body><ul>"
-    files = [os.path.join(DATA_DIR, f) for f in os.listdir()]
+    files = os.listdir()
     files = [
         f for f in files if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
     ]
@@ -56,10 +56,8 @@ def make_index_html() -> None:
     print(f"Writing {index_html}")
     with open(index_html, "w") as f:
         f.write(html_str)
+    return 0
 
-
-def main() -> int:
-    make_index_html()
 
 
 
