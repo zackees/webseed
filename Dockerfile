@@ -38,7 +38,7 @@ RUN apt-get install -y \
     git \
     make gcc g++ nodejs npm
 
-RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid -g
+RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server -g
 
 # Still work in progress.
 
@@ -52,25 +52,25 @@ RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid -g
 WORKDIR /app
 
 # Install all the dependencies as it's own layer.
-#COPY ./requirements.txt requirements.txt
-#RUN pip install --no-cache-dir --upgrade pip
-#RUN pip install --no-cache-dir -r requirements.txt
+# COPY ./requirements.txt requirements.txt
+# RUN pip install --no-cache-dir --upgrade pip
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # Add requirements file and install.
 # COPY . .
 
 # RUN python -m pip install --no-cache-dir -e .
-#RUN ./install.sh
+# RUN ./install.sh
 
 # Expose the port and then launch the app.
 EXPOSE 80
 
 
 # Note reload allows restart by file touch.
-#CMD ["uvicorn", "--host", "0.0.0.0", "--reload", "--reload-exclude", "*", "--reload-include", "reload.file", "--workers", "1", "--ws", "websockets", "--forwarded-allow-ips", "*", "--port", "80", "--debug", "true", "webtorrent_movie_server.app:app"]
-#CMD ["webtorrent-hybrid", "seed", "--keep-seeding", "make_venv.py", "--announce", "wss://webtorrent-tracker.onrender.com", "--port", "8000"]
+# CMD ["uvicorn", "--host", "0.0.0.0", "--reload", "--reload-exclude", "*", "--reload-include", "reload.file", "--workers", "1", "--ws", "websockets", "--forwarded-allow-ips", "*", "--port", "80", "--debug", "true", "webtorrent_movie_server.app:app"]
+# CMD ["webtorrent-hybrid", "seed", "--keep-seeding", "make_venv.py", "--announce", "wss://webtorrent-tracker.onrender.com", "--port", "8000"]
 # CMD ["/bin/bash", "run.sh"]
-#CMD ["uvicorn", "--host", "0.0.0.0", "--reload", "--reload-dir", "restart", "--workers", "1", "--forwarded-allow-ips=*", "--port", "80", "webtorrent_movie_server.app:app"]
+# CMD ["uvicorn", "--host", "0.0.0.0", "--reload", "--reload-dir", "restart", "--workers", "1", "--forwarded-allow-ips=*", "--port", "80", "webtorrent_movie_server.app:app"]
 
 
 #FROM node:18-bullseye
@@ -79,6 +79,6 @@ EXPOSE 80
 #run apt-get install -y python
 
 # RUN npm install -g node-pre-gyp webtorrent-cli webtorrent-hybrid http-server
-EXPOSE 80
+# EXPOSE 80
 COPY . .
 CMD ["/bin/sh", "./run.sh"]
