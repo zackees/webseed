@@ -10,10 +10,12 @@ def create_webtorrent_files(file: str) -> None:
     magnet_path = os.path.join(DATA_DIR, file + ".magnet")
     if not os.path.exists(torrent_path):
         cmd = f"webtorrent-hybrid create {file} -o {file}.torrent"
+        print(f"Running: {cmd}")
         os.system(cmd)
     if not os.path.exists(magnet_path):
         # Now create the magnet file
         cmd = f"webtorrent-hybrid seed {file} -q"
+        print(f"Running: {cmd}")
         proc = subprocess.Popen(
             cmd,
             shell=True,
@@ -22,7 +24,9 @@ def create_webtorrent_files(file: str) -> None:
             universal_newlines=True,
         )
         # Wait for the first line to appear from stdout
+        print("Waiting for magnet url")
         magneturi = proc.stdout.readline().strip()
+        print(f"Got magnet url: {magneturi}")
         proc.kill()
         # Write the magnet file
         with open(f"{file}.magnet", "w") as f:
@@ -44,7 +48,9 @@ def make_index_html() -> None:
         html_str += f'<li><a href="{f}">{f}</a></li>'
     html_str += "</ul></body></html>"
     # Write the HTML file
-    with open(os.path.join(DATA_DIR, "_index.html"), "w") as f:
+    index_html = os.path.join(DATA_DIR, "_index.html")
+    print(f"Writing {index_html}")
+    with open(index_html, "w") as f:
         f.write(html_str)
 
 
