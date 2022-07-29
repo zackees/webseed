@@ -128,7 +128,8 @@ def create_webtorrent_files(file: str) -> None:
         with open(magnet_path, "w") as f:
             f.write(magneturi)
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
-    if not os.path.exists(html_path):
+    if not os.path.exists(html_path) and os.path.exists(magnet_path):
+        magneturi = open(magnet_path).read().strip()
         html = HTML_TEMPLATE.replace("__MAGNET__", magneturi).replace("__WEBSEED__", f"{DOMAIN_NAME}/{file}")
         with open(html_path, "w") as f:
             f.write(html)
