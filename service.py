@@ -31,8 +31,8 @@ def create_webtorrent_files(file: str) -> None:
         # Write the magnet file
         with open(f"{file}.magnet", "w") as f:
             f.write(magneturi)
-    assert os.path.exists(torrent_path)
-    assert os.path.exists(magnet_path)
+    assert os.path.exists(torrent_path), f"Missing {torrent_path}"
+    assert os.path.exists(magnet_path), f"Missing {magnet_path}"
 
 
 def make_index_html() -> None:
