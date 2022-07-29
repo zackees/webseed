@@ -2,7 +2,7 @@ import time
 import os
 import subprocess
 
-DATA_DIR = "/var/data"
+DATA_DIR = os.environ.get('DATA_DIR', "/var/data")
 
 
 def create_webtorrent_files(file: str) -> None:
@@ -38,7 +38,7 @@ def create_webtorrent_files(file: str) -> None:
 def make_index_html() -> None:
     # Scan DATA_DIR for movie files
     html_str = "<html><body><ul>"
-    files = os.listdir(DATA_DIR)
+    files = [os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR)]
     files = [
         f for f in files if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
     ]
