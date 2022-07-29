@@ -5,6 +5,7 @@ FROM --platform=linux/amd64 python:3.10.5-bullseye
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
+
 RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     apt-transport-https \
     ca-certificates \
@@ -38,7 +39,7 @@ RUN apt-get install -y \
     git \
     make gcc g++ nodejs npm
 
-RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server -g
+RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server pm2 -g
 
 # Still work in progress.
 
