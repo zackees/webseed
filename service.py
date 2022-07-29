@@ -6,7 +6,7 @@ DATA_DIR = "/var/data"
 
 
 def create_webtorrent_files(file: str) -> None:
-    torrent_path = os.path.join(DATA_DIR, file + ".torrent")
+    torrent_path = os.path.join(file + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet")
     if not os.path.exists(torrent_path):
         cmd = f"webtorrent-hybrid create {file} -o {file}.torrent"
