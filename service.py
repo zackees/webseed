@@ -152,7 +152,8 @@ def main() -> int:
     for file in files:
         try:
             iframe_src = create_webtorrent_files(file)
-            html_str += f'<li><a href="{iframe_src}">{iframe_src}</a></li>'
+            assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
+            html_str += f'<li><h3><a href="{iframe_src}">{file}</a></h3></li>'
         except Exception as e:
             print(f"Failed to create webtorrent files for {file}: {e}")
             continue
