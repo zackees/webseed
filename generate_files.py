@@ -109,7 +109,7 @@ HTML_TEMPLATE = """
 
 # import md5 lib
 def filemd5(filename):
-    with open(filename, 'rb') as f:
+    with open(filename, mode='rb') as f:
         d = hashlib.md5()
         for buf in iter(lambda: f.read(128 * d.block_size), b''):
             d.update(buf)
@@ -154,14 +154,14 @@ def create_webtorrent_files(file: str) -> str:
         print(f"Got magnet url: {magneturi}")
         proc.kill()
         # Write the magnet file
-        with open(magnet_path, "w") as f:
+        with open(magnet_path, encoding="utf-8", mode="w") as f:
             f.write(magneturi)
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
     if not os.path.exists(html_path) and os.path.exists(magnet_path):
-        magneturi = open(magnet_path).read().strip()
+        magneturi = open(magnet_path, encoding="utf-8", mode="r").read().strip()
         html = HTML_TEMPLATE.replace("__TORRENT_ID__", os.path.relpath(torrent_path, OUT_DIR))
         html = html.replace("__WEBSEED__", f"{DOMAIN_NAME}/{os.path.relpath(file, OUT_DIR)}")
-        with open(html_path, "w") as f:
+        with open(html_path, encoding="utf-8", mode="w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
     return html_path
@@ -187,7 +187,7 @@ def main() -> int:
     # Write the HTML file
     index_html = "_index.html"
     print(f"Writing {index_html}")
-    with open(index_html, "w") as f:
+    with open(index_html, encoding="utf-8", mode="w") as f:
         f.write(html_str)
     return 0
 
