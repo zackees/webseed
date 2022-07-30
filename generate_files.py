@@ -159,8 +159,10 @@ def create_webtorrent_files(file: str) -> str:
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
     if not os.path.exists(html_path) and os.path.exists(magnet_path):
         magneturi = open(magnet_path, encoding="utf-8", mode="r").read().strip()
-        html = HTML_TEMPLATE.replace("__TORRENT_ID__", os.path.relpath(torrent_path, OUT_DIR))
-        html = html.replace("__WEBSEED__", f"{DOMAIN_NAME}/{os.path.relpath(file, OUT_DIR)}")
+        torrent_id = f"{DOMAIN_NAME}/{os.path.relpath(torrent_path, OUT_DIR)}"
+        webseed = f"{DOMAIN_NAME}/{os.path.relpath(file, OUT_DIR)}"
+        html = HTML_TEMPLATE.replace("__TORRENT_ID__", torrent_id)
+        html = html.replace("__WEBSEED__", webseed)
         with open(html_path, encoding="utf-8", mode="w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
