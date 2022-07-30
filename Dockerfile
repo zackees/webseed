@@ -1,22 +1,19 @@
 # FROM ubuntu:22.04
-FROM --platform=linux/amd64 python:3.10.5-bullseye
+FROM --platform=linux/amd64 python:3.10.5-slim-bullseye
+
+WORKDIR /app
 
 # Might be necessary.
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-
 RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     apt-transport-https \
     ca-certificates \
-    curl
-
-#&& rm -rf /var/lib/apt/lists/*;
+    curl nodejs npm nano \
+    && rm -rf /var/lib/apt/lists/*;
 # From the webtorrent-hybrid dockerfile.
-
-RUN apt-get install -y \
-    git \
-    make gcc g++ nodejs npm nano
+RUN apt-get install -y nodejs npm nano
 
 RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server pm2 -g
 RUN pip install magic-wormhole yt-dlp
@@ -29,7 +26,7 @@ RUN pip install magic-wormhole yt-dlp
 #    rm -rf /var/lib/apt/lists/* && \
 #    npm i -g node-pre-gyp
 
-WORKDIR /app
+
 # Expose the port and then launch the app.
 EXPOSE 80
 COPY . .
