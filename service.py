@@ -1,8 +1,11 @@
-import time
+"""
+Service generates webtorrent files and index.html
+"""
+
 import os
 import subprocess
 
-DATA_DIR = os.environ.get('DATA_DIR', "/var/data")
+DATA_DIR = os.environ.get("DATA_DIR", "/var/data")
 
 DOMAIN_NAME = "https://webtorrent-webseed.onrender.com"
 
@@ -57,9 +60,9 @@ HTML_TEMPLATE = """
   // get the current time
   const time = new Date().getTime()
 
-  const torrentId = '__MAGNET__'
+  const TORRENT_ID = '__TORRENT_ID__'
   const WEBSEED = '__WEBSEED__'
-  const torrent = client.add(torrentId, () => {
+  const torrent = client.add(TORRENT_ID, () => {
     console.log('ON TORRENT STARTED')
   })
 
@@ -130,7 +133,9 @@ def create_webtorrent_files(file: str) -> None:
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
     if not os.path.exists(html_path) and os.path.exists(magnet_path):
         magneturi = open(magnet_path).read().strip()
-        html = HTML_TEMPLATE.replace("__MAGNET__", magneturi).replace("__WEBSEED__", f"{DOMAIN_NAME}/{file}")
+        html = HTML_TEMPLATE.replace("__TORRENT_ID__", torrent_path).replace(
+            "__WEBSEED__", f"{DOMAIN_NAME}/{file}"
+        )
         with open(html_path, "w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
@@ -158,8 +163,6 @@ def main() -> int:
     with open(index_html, "w") as f:
         f.write(html_str)
     return 0
-
-
 
 
 if __name__ == "__main__":
