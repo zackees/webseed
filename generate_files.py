@@ -67,9 +67,9 @@ HTML_TEMPLATE = """
   // get the current time
   const time = new Date().getTime()
 
-  const TORRENT_ID = '__TORRENT_ID__'
+  const TORRENT_URL = '__TORRENT_URL__'
   const WEBSEED = '__WEBSEED__'
-  const torrent = client.add(TORRENT_ID, () => {
+  const torrent = client.add(TORRENT_URL, () => {
     console.log('ON TORRENT STARTED')
   })
 
@@ -116,14 +116,16 @@ def filemd5(filename):
             d.update(buf)
     return d.hexdigest()
 
-
-def create_webtorrent_files(file: str) -> str:
+def get_files(file: str) -> str:
     filename = os.path.basename(file)
     md5file = os.path.join(OUT_DIR, f"{filename}.md5")
     torrent_path = os.path.join(OUT_DIR, filename + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet.txt")
     html_path = os.path.join(torrent_path + ".html")
+    return md5file, torrent_path, magnet_path, html_path
 
+def create_webtorrent_files(file: str) -> str:
+    md5file, torrent_path, magnet_path, html_path = get_files(file)
     # Generate the md5 file
     md5 = filemd5(file)
     if not os.path.exists(md5file) or md5 != open(md5file).read():
@@ -162,7 +164,7 @@ def create_webtorrent_files(file: str) -> str:
         magneturi = open(magnet_path, encoding="utf-8", mode="r").read().strip()
         torrent_id = f"{DOMAIN_NAME}/{os.path.basename(torrent_path)}"
         webseed = f"{DOMAIN_NAME}/content/{os.path.basename(file)}"
-        html = HTML_TEMPLATE.replace("__TORRENT_ID__", torrent_id)
+        html = HTML_TEMPLATE.replace("__TORRENT_URL__", torrent_id)
         html = html.replace("__WEBSEED__", webseed)
         with open(html_path, encoding="utf-8", mode="w") as f:
             f.write(html)
