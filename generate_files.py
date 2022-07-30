@@ -4,6 +4,7 @@ Service generates webtorrent files and
 import os
 import subprocess
 import hashlib
+import time
 
 # Directory structure is
 # DATA_DIR/content - contains *.mp4 or *.webm files
@@ -109,9 +110,9 @@ HTML_TEMPLATE = """
 
 # import md5 lib
 def filemd5(filename):
-    with open(filename, mode='rb') as f:
+    with open(filename, mode="rb") as f:
         d = hashlib.md5()
-        for buf in iter(lambda: f.read(128 * d.block_size), b''):
+        for buf in iter(lambda: f.read(128 * d.block_size), b""):
             d.update(buf)
     return d.hexdigest()
 
@@ -172,16 +173,31 @@ def create_webtorrent_files(file: str) -> str:
 def main() -> int:
     # Scan DATA_DIR for movie files
     os.chdir(CONTENT_DIR)
+
+    while True:
+        files = os.listdir()
+        files = [
+            f
+            for f in files
+            if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
+        ]
+        if not files:
+            return 0
+        # Get the most recent time stamps
+        newest_file = sorted(files, key=lambda f: os.path.getmtime(f))[0]
+        # If newest_file is younger than 10 seconds, then wait then try again
+        if os.path.getmtime(newest_file) > time.time() - 10:
+            time.sleep(1)
+            continue
+        break
     html_str = "<html><body><ul>"
-    files = os.listdir()
-    files = [
-        f for f in files if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
-    ]
     for file in files:
         try:
             iframe_src = create_webtorrent_files(file)
             assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
-            html_str += f'<li><h3><a href="{os.path.basename(iframe_src)}">{file}</a></h3></li>'
+            html_str += (
+                f'<li><h3><a href="{os.path.basename(iframe_src)}">{file}</a></h3></li>'
+            )
         except Exception as e:
             print(f"Failed to create webtorrent files for {file}: {e}")
             continue
