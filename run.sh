@@ -1,4 +1,5 @@
 set -e
+cd /var/data && rm *.torrent* && rm *.md5
 cp /app/README.md /var/data/README.md
 # Create services and start running them.
 pm2 start "python /app/generate_files.py" --watch /var/data/content --restart-delay=10000 --no-autorestart
