@@ -169,7 +169,7 @@ def create_webtorrent_files(file: str) -> str:
 
 def main() -> int:
     # Scan DATA_DIR for movie files
-    os.chdir(DATA_DIR)
+    os.chdir(CONTENT_DIR)
     html_str = "<html><body><ul>"
     files = os.listdir()
     files = [
