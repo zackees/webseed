@@ -159,8 +159,8 @@ def create_webtorrent_files(file: str) -> str:
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
     if not os.path.exists(html_path) and os.path.exists(magnet_path):
         magneturi = open(magnet_path, encoding="utf-8", mode="r").read().strip()
-        torrent_id = f"{DOMAIN_NAME}/{os.path.relpath(torrent_path, OUT_DIR)}"
-        webseed = f"{DOMAIN_NAME}/{os.path.relpath(file, OUT_DIR)}"
+        torrent_id = f"{DOMAIN_NAME}/{os.path.basename(torrent_path)}"
+        webseed = f"{DOMAIN_NAME}/content/{os.path.basename(file)}"
         html = HTML_TEMPLATE.replace("__TORRENT_ID__", torrent_id)
         html = html.replace("__WEBSEED__", webseed)
         with open(html_path, encoding="utf-8", mode="w") as f:
@@ -181,7 +181,7 @@ def main() -> int:
         try:
             iframe_src = create_webtorrent_files(file)
             assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
-            html_str += f'<li><h3><a href="{iframe_src}">{file}</a></h3></li>'
+            html_str += f'<li><h3><a href="{os.path.basename(iframe_src)}">{file}</a></h3></li>'
         except Exception as e:
             print(f"Failed to create webtorrent files for {file}: {e}")
             continue
