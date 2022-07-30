@@ -12,8 +12,6 @@ RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     ca-certificates \
     curl nodejs npm nano \
     && rm -rf /var/lib/apt/lists/*;
-# From the webtorrent-hybrid dockerfile.
-RUN apt-get install -y nodejs npm nano
 
 RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server pm2 -g
 RUN pip install magic-wormhole yt-dlp
