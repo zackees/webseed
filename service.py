@@ -4,7 +4,13 @@ Service generates webtorrent files and
 import os
 import subprocess
 
+# Directory structure is
+# DATA_DIR/content - contains *.mp4 or *.webm files
+# DATA_DIR - contains the generated files
 DATA_DIR = os.environ.get("DATA_DIR", "/var/data")
+CONTENT_DIR = os.path.join(DATA_DIR, "content")
+OUT_DIR = DATA_DIR
+os.makedirs(DATA_DIR, exist_ok=True)
 
 DOMAIN_NAME = "https://webtorrent-webseed.onrender.com"
 
@@ -102,7 +108,8 @@ HTML_TEMPLATE = """
 
 
 def create_webtorrent_files(file: str) -> str:
-    torrent_path = os.path.join(file + ".torrent")
+    filename = os.path.basename(file)
+    torrent_path = os.path.join(OUT_DIR, filename + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet.txt")
     html_path = os.path.join(torrent_path + ".html")
     if not os.path.exists(torrent_path):
@@ -132,9 +139,8 @@ def create_webtorrent_files(file: str) -> str:
         assert os.path.exists(magnet_path), f"Missing {magnet_path}"
     if not os.path.exists(html_path) and os.path.exists(magnet_path):
         magneturi = open(magnet_path).read().strip()
-        html = HTML_TEMPLATE.replace("__TORRENT_ID__", torrent_path).replace(
-            "__WEBSEED__", f"{DOMAIN_NAME}/{file}"
-        )
+        html = HTML_TEMPLATE.replace("__TORRENT_ID__", os.path.relpath(torrent_path, OUT_DIR))
+        html = html.replace("__WEBSEED__", f"{DOMAIN_NAME}/{os.path.relpath(file, OUT_DIR)}")
         with open(html_path, "w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
