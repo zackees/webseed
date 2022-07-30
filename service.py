@@ -101,7 +101,7 @@ HTML_TEMPLATE = """
 """
 
 
-def create_webtorrent_files(file: str) -> None:
+def create_webtorrent_files(file: str) -> str:
     torrent_path = os.path.join(file + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet.txt")
     html_path = os.path.join(torrent_path + ".html")
@@ -138,6 +138,7 @@ def create_webtorrent_files(file: str) -> None:
         with open(html_path, "w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
+    return html_path
 
 
 def main() -> int:
@@ -150,8 +151,8 @@ def main() -> int:
     ]
     for file in files:
         try:
-            create_webtorrent_files(file)
-            html_str += f'<li><a href="{file}">{file}</a></li>'
+            iframe_src = create_webtorrent_files(file)
+            html_str += f'<li><a href="{iframe_src}">{iframe_src}</a></li>'
         except Exception as e:
             print(f"Failed to create webtorrent files for {file}: {e}")
             continue
