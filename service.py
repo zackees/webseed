@@ -1,7 +1,6 @@
 """
-Service generates webtorrent files and index.html
+Service generates webtorrent files and 
 """
-
 import os
 import subprocess
 
