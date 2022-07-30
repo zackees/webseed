@@ -40,7 +40,7 @@ RUN apt-get install -y \
     make gcc g++ nodejs npm nano
 
 RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server pm2 -g
-RUN pip install magic-wormhole
+RUN pip install magic-wormhole yt-dlp
 
 # Still work in progress.
 
