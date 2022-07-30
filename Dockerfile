@@ -9,33 +9,12 @@ ENV LANG=C.UTF-8
 RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     apt-transport-https \
     ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common \
-    git-all \
-    pkg-config \
-    libncurses5-dev \
-    libssl-dev \
-    libnss3-dev \
-    libexpat-dev \
-    npm \
-    nodejs
+    curl
+
 #&& rm -rf /var/lib/apt/lists/*;
-
-
-
-
-
 # From the webtorrent-hybrid dockerfile.
 
 RUN apt-get install -y \
-    libgtk2.0-dev \
-    libgconf-2-4 \
-    libasound2 \
-    libxtst6 \
-    libxss1 \
-    libnss3 \
-    xvfb \
     git \
     make gcc g++ nodejs npm nano
 
