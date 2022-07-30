@@ -185,7 +185,7 @@ def main() -> int:
             continue
     html_str += "</ul></body></html>"
     # Write the HTML file
-    index_html = "_index.html"
+    index_html = os.path.join(OUT_DIR, "_index.html")
     print(f"Writing {index_html}")
     with open(index_html, encoding="utf-8", mode="w") as f:
         f.write(html_str)
