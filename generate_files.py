@@ -3,6 +3,7 @@ Service generates webtorrent files and
 """
 import os
 import subprocess
+import hashlib
 
 # Directory structure is
 # DATA_DIR/content - contains *.mp4 or *.webm files
@@ -106,12 +107,31 @@ HTML_TEMPLATE = """
 </html>
 """
 
+# import md5 lib
+def filemd5(filename):
+    with open(filename, 'rb') as f:
+        d = hashlib.md5()
+        for buf in iter(lambda: f.read(128 * d.block_size), b''):
+            d.update(buf)
+    return d.hexdigest()
+
 
 def create_webtorrent_files(file: str) -> str:
     filename = os.path.basename(file)
+    md5file = os.path.join(OUT_DIR, f"{filename}.md5")
     torrent_path = os.path.join(OUT_DIR, filename + ".torrent")
     magnet_path = os.path.join(torrent_path + ".magnet.txt")
     html_path = os.path.join(torrent_path + ".html")
+
+    # Generate the md5 file
+    md5 = filemd5(file)
+    if not os.path.exists(md5file) or md5 != open(md5file).read():
+        print(f"MD5 mismatch for {file}")
+        for f in [md5file, torrent_path, magnet_path, html_path]:
+            if os.path.exists(f):
+                os.remove(f)
+        with open(md5file, "w") as f:
+            f.write(md5)
     if not os.path.exists(torrent_path):
         cmd = f'webtorrent-hybrid create "{file}" -o "{torrent_path}"'
         print(f"Running: {cmd}")
