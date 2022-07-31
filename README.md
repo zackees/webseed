@@ -11,7 +11,7 @@ Blazing Webseed Implementation for Webtorrent
   * Updating files
     * ssh into the running instance
     * Upload the content that you want to the `var/data/content` directory
-      * You can use `yt-dlp` to download it quickly from youtube
+      * Note, most videos downloaded from youtube DONT WORK. The around is to re-encode using ffmpeg and the x264 codec.
       * Wormhole file transfer is built into this service.
         * On your local machine with the content use: `wormhole send myfile.mp4`
         * Copy and paste the magic command into the remote machine and the file
