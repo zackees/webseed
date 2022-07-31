@@ -1,10 +1,8 @@
 # Webseed
 
-A Blazing Fast Webseed implementation for Serverless Webtorrent using webseeds.
+A Blazing Fast implementation of Webtorrent using webseeds.
 
-Or... How I nearly destroyed my life in the pursuit of figuring this out, so you don't have to.
-
-Please give this project a star.
+This project will allow you to place mp4 content in a folder and have a webtorrent enabled video site generated.
 
 # Usage
 
@@ -21,3 +19,4 @@ Please give this project a star.
         * On your local machine with the content use: `wormhole send myfile.mp4`
         * Copy and paste the magic command into the remote machine and the file
           will transfer.
+
