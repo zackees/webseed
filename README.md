@@ -1,14 +1,8 @@
 # Webseed
 
-A Blazing Fast implementation of Webtorrent using webseeds.
+A Blazing Fast implementation of Webtorrent server using webseeds.
 
-This project will allow you to place mp4 content in a folder and have a webtorrent enabled video site generated.
-
-The workflow looks like this:
-  * ssh into the running instance
-  * upload content to `/var/data/content`
-  * wait for website assets to be generated.
-  * open up the file that ends in *.html for the generated video pages
+This project will transform mp4 content into a viewable html webtorrent page, which you can copy into your site.
 
 # Usage
 
