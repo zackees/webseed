@@ -5,14 +5,28 @@ import os
 import subprocess
 import hashlib
 import time
+import sys
+
+import argparse
+
+DEFAULT_DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
+DEFAULT_OUT_DIR = os.environ.get("DATA_DIR", "/var/data")
+DEFAULT_CONTENT_DIR = os.path.join(DEFAULT_OUT_DIR, "content")
+
+parser = argparse.ArgumentParser("Generate webtorrent files.")
+parser.add_argument("--domain", help="Domain name", default=DEFAULT_DOMAIN_NAME)
+parser.add_argument("--content_dir", help="Directory where mp4's are found", default=DEFAULT_CONTENT_DIR)
+parser.add_argument("--output_dir", help="Directory where webtorrent files are generated", default=DEFAULT_OUT_DIR)
+args = parser.parse_args()
 
 # Directory structure is
 # DATA_DIR/content - contains *.mp4 or *.webm files
 # DATA_DIR - contains the generated files
-DATA_DIR = os.environ.get("DATA_DIR", "/var/data")
-CONTENT_DIR = os.path.join(DATA_DIR, "content")
-OUT_DIR = DATA_DIR
-os.makedirs(DATA_DIR, exist_ok=True)
+
+CONTENT_DIR = args.content_dir
+OUT_DIR = args.output_dir
+os.makedirs(CONTENT_DIR, exist_ok=True)
+os.makedirs(OUT_DIR, exist_ok=True)
 
 TRACKER_ANNOUNCE = os.environ.get("TRACKER_ANNOUNCE", "wss://webtorrent-tracker.onrender.com")
 DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
@@ -173,45 +187,42 @@ def create_webtorrent_files(file: str) -> str:
     return html_path
 
 
-def main() -> int:
-    # Scan DATA_DIR for movie files
-    os.chdir(CONTENT_DIR)
 
-    while True:
-        files = os.listdir()
-        files = [
-            f
-            for f in files
-            if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
-        ]
-        if not files:
-            return 0
-        # Get the most recent time stamps
-        newest_file = sorted(files, key=lambda f: os.path.getmtime(f))[0]
-        # If newest_file is younger than 10 seconds, then wait then try again
-        if os.path.getmtime(newest_file) > time.time() - 10:
-            time.sleep(1)
-            continue
-        break
-    html_str = "<html><body><ul>"
-    for file in files:
-        try:
-            iframe_src = create_webtorrent_files(file)
-            assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
-            html_str += (
-                f'<li><h3><a href="{os.path.basename(iframe_src)}">{file}</a></h3></li>'
-            )
-        except Exception as e:
-            print(f"Failed to create webtorrent files for {file}: {e}")
-            continue
-    html_str += "</ul></body></html>"
-    # Write the HTML file
-    index_html = os.path.join(OUT_DIR, "_index.html")
-    print(f"Writing {index_html}")
-    with open(index_html, encoding="utf-8", mode="w") as f:
-        f.write(html_str)
-    return 0
+# Scan DATA_DIR for movie files
+os.chdir(CONTENT_DIR)
 
+while True:
+    files = os.listdir()
+    files = [
+        f
+        for f in files
+        if f.lower().endswith(".mp4") or f.lower().endswith(".webm")
+    ]
+    if not files:
+        sys.exit(0)
+    # Get the most recent time stamps
+    newest_file = sorted(files, key=lambda f: os.path.getmtime(f))[0]
+    # If newest_file is younger than 10 seconds, then wait then try again
+    if os.path.getmtime(newest_file) > time.time() - 10:
+        time.sleep(1)
+        continue
+    break
+html_str = "<html><body><ul>"
+for file in files:
+    try:
+        iframe_src = create_webtorrent_files(file)
+        assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
+        html_str += (
+            f'<li><h3><a href="{os.path.basename(iframe_src)}">{file}</a></h3></li>'
+        )
+    except Exception as e:
+        print(f"Failed to create webtorrent files for {file}: {e}")
+        continue
+html_str += "</ul></body></html>"
+# Write the HTML file
+index_html = os.path.join(OUT_DIR, "_index.html")
+print(f"Writing {index_html}")
+with open(index_html, encoding="utf-8", mode="w") as f:
+    f.write(html_str)
 
-if __name__ == "__main__":
-    main()
+sys.exit(0)

@@ -28,4 +28,6 @@ RUN pip install magic-wormhole yt-dlp
 # Expose the port and then launch the app.
 EXPOSE 80
 COPY . .
+ENV DOMAIN_NAME https://webtorrent-webseed.onrender.com
+ENV DATA_DIR /var/data
 CMD ["/bin/sh", "./run.sh"]
