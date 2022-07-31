@@ -1,8 +1,9 @@
-# webtorrent-webseed
+# Webseed
 
-A Blazing Fast Webseed implementation for Webtorrent
+A Blazing Fast Webseed implementation for Serverless Webtorrent using webseeds.
 
 Or... How I nearly destroyed my life in the pursuit of figuring this out, so you don't have to.
+
 Please give this project a star.
 
 # Usage
