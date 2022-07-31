@@ -14,8 +14,8 @@ CONTENT_DIR = os.path.join(DATA_DIR, "content")
 OUT_DIR = DATA_DIR
 os.makedirs(DATA_DIR, exist_ok=True)
 
-DOMAIN_NAME = "https://webtorrent-webseed.onrender.com"
-
+TRACKER_ANNOUNCE = os.environ.get("TRACKER_ANNOUNCE", "wss://webtorrent-tracker.onrender.com")
+DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -136,7 +136,8 @@ def create_webtorrent_files(file: str) -> str:
         with open(md5file, "w") as f:
             f.write(md5)
     if not os.path.exists(torrent_path):
-        cmd = f'webtorrent-hybrid create "{file}" -o "{torrent_path}"'
+        tracker_part = f"--announce {TRACKER_ANNOUNCE}" if TRACKER_ANNOUNCE else ""
+        cmd = f'webtorrent-hybrid create "{file}" {tracker_part} -o "{torrent_path}"'
         print(f"Running: {cmd}")
         os.system(cmd)
         assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"
