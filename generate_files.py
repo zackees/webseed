@@ -193,9 +193,11 @@ for movie_file in files:
         iframe_src, torrent_path = create_webtorrent_files(movie_file)
         assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
         html_str += (
-            f'<li><h3><a href="{os.path.basename(iframe_src)}">{iframe_src}</a></h3></li>'
-            f'<li><a href="{os.path.basename(movie_file)}">{movie_file}</a></li>'
-            f'<li><a href="{os.path.basename(torrent_path)}">{torrent_path}</a></li>'
+            '<li>'
+            f'  <h3><a href="{os.path.basename(iframe_src)}">{os.path.basename(iframe_src)}</a></h3>'
+            f'  <li><a href="{os.path.basename(movie_file)}">{f"{DOMAIN_NAME}/content/{os.path.basename(movie_file)}"}</a></li>'
+            f'  <li><a href="{os.path.basename(torrent_path)}">{torrent_path}</a></li>'
+            '</li>'
         )
     except Exception as e:
         print(f"Failed to create webtorrent files for {movie_file}: {e}")
