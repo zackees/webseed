@@ -164,7 +164,7 @@ def create_webtorrent_files(file: str) -> str:
         with open(html_path, encoding="utf-8", mode="w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
-    return html_path
+    return html_path, torrent_path
 
 
 
@@ -188,15 +188,17 @@ while True:
         continue
     break
 html_str = "<html><body><ul>"
-for file in files:
+for movie_file in files:
     try:
-        iframe_src = create_webtorrent_files(file)
+        iframe_src, torrent_path = create_webtorrent_files(movie_file)
         assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
         html_str += (
-            f'<li><h3><a href="{os.path.basename(iframe_src)}">{file}</a></h3></li>'
+            f'<li><h3><a href="{os.path.basename(iframe_src)}">{iframe_src}</a></h3></li>'
+            f'<li><a href="{os.path.basename(movie_file)}">{movie_file}</a></li>'
+            f'<li><a href="{os.path.basename(torrent_path)}">{torrent_path}</a></li>'
         )
     except Exception as e:
-        print(f"Failed to create webtorrent files for {file}: {e}")
+        print(f"Failed to create webtorrent files for {movie_file}: {e}")
         continue
 html_str += "</ul></body></html>"
 # Write the HTML file
