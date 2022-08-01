@@ -6,21 +6,11 @@ import hashlib
 import time
 import sys
 
-import argparse
-
-DEFAULT_DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
-DEFAULT_OUT_DIR = os.environ.get("DATA_DIR", "/var/data")
-
-parser = argparse.ArgumentParser("Generate webtorrent files.")
-parser.add_argument("--domain", help="Domain name", default=DEFAULT_DOMAIN_NAME)
-parser.add_argument("--output_dir", help="Directory where webtorrent files are generated", default=DEFAULT_OUT_DIR)
-args = parser.parse_args()
-
 # Directory structure is
 # DATA_DIR/content - contains *.mp4 or *.webm files
 # DATA_DIR - contains the generated files
 CHUNK_FACTOR = 17  # 128KB, or n^17
-OUT_DIR = args.output_dir
+OUT_DIR = os.environ.get("DATA_DIR", "/var/data")
 CONTENT_DIR = os.path.join(OUT_DIR, "content")
 os.makedirs(CONTENT_DIR, exist_ok=True)
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -207,7 +197,7 @@ for movie_file in files:
         continue
 html_str += "</ul></body></html>"
 # Write the HTML file
-index_html = os.path.join(OUT_DIR, "_index.html")
+index_html = os.path.join(OUT_DIR, "index.html")
 print(f"Writing {index_html}")
 with open(index_html, encoding="utf-8", mode="w") as f:
     f.write(html_str)
