@@ -146,8 +146,8 @@ def create_webtorrent_files(file: str) -> str:
         with open(md5file, "w") as f:
             f.write(md5)
     if not os.path.exists(torrent_path):
-        tracker_part = f"--announce {TRACKER_ANNOUNCE}" if TRACKER_ANNOUNCE else ""
-        cmd = f'webtorrent-hybrid create "{file}" {tracker_part} -o "{torrent_path}"'
+        assert TRACKER_ANNOUNCE
+        cmd = f'mktorrent "{file}" -a {TRACKER_ANNOUNCE} -l 17 -o "{torrent_path}"'
         print(f"Running: {cmd}")
         os.system(cmd)
         assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"

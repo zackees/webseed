@@ -11,9 +11,11 @@ RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     apt-transport-https \
     ca-certificates \
     curl nodejs npm nano \
+    sudo \
+    mktorrent \
     && rm -rf /var/lib/apt/lists/*;
 
-RUN npm install node-pre-gyp webtorrent-cli webtorrent-hybrid http-server pm2 -g
+RUN npm install http-server pm2 -g
 RUN pip install magic-wormhole yt-dlp
 
 # Still work in progress.
