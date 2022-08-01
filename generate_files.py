@@ -25,7 +25,10 @@ CONTENT_DIR = os.path.join(OUT_DIR, "content")
 os.makedirs(CONTENT_DIR, exist_ok=True)
 os.makedirs(OUT_DIR, exist_ok=True)
 
-TRACKER_ANNOUNCE = os.environ.get("TRACKER_ANNOUNCE", "wss://webtorrent-tracker.onrender.com")
+TRACKER_ANNOUNCE_LIST = [
+  "wss://webtorrent-tracker.onrender.com",
+  "wss://tracker.btorrent.xyz"
+]
 DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
 STUN_SERVERS = os.environ.get("STUN_SERVERS", '"stun:relay.socket.dev:443", "stun:global.stun.twilio.com:3478"')
 
@@ -146,8 +149,9 @@ def create_webtorrent_files(file: str) -> str:
         with open(md5file, "w") as f:
             f.write(md5)
     if not os.path.exists(torrent_path):
-        assert TRACKER_ANNOUNCE
-        cmd = f'mktorrent "{file}" -a {TRACKER_ANNOUNCE} -a wss://tracker.btorrent.xyz -l {CHUNK_FACTOR} -o "{torrent_path}"'
+        assert TRACKER_ANNOUNCE_LIST
+        tracker_announce = "-a " + " -a ".join(TRACKER_ANNOUNCE_LIST)
+        cmd = f'mktorrent "{file}" {tracker_announce} -l {CHUNK_FACTOR} -o "{torrent_path}"'
         print(f"Running: {cmd}")
         os.system(cmd)
         assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"
