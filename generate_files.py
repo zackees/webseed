@@ -147,7 +147,7 @@ def create_webtorrent_files(file: str) -> str:
             f.write(md5)
     if not os.path.exists(torrent_path):
         assert TRACKER_ANNOUNCE
-        cmd = f'mktorrent "{file}" -a {TRACKER_ANNOUNCE} -l {CHUNK_FACTOR} -o "{torrent_path}"'
+        cmd = f'mktorrent "{file}" -a {TRACKER_ANNOUNCE} -a wss://tracker.btorrent.xyz -l {CHUNK_FACTOR} -o "{torrent_path}"'
         print(f"Running: {cmd}")
         os.system(cmd)
         assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"
