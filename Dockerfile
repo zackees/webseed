@@ -32,4 +32,6 @@ EXPOSE 80
 COPY . .
 ENV DOMAIN_NAME https://webtorrent-webseed.onrender.com
 ENV DATA_DIR /var/data
+ENV STUN_SERVERS '"stun:relay.socket.dev:443", "stun:global.stun.twilio.com:3478"'
+ENV DOMAIN_NAME https://webtorrent-webseed.onrender.com
 CMD ["/bin/sh", "./run.sh"]

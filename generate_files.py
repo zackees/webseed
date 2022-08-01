@@ -19,7 +19,7 @@ args = parser.parse_args()
 # Directory structure is
 # DATA_DIR/content - contains *.mp4 or *.webm files
 # DATA_DIR - contains the generated files
-
+CHUNK_FACTOR = 17  # 128KB, or n^17
 OUT_DIR = args.output_dir
 CONTENT_DIR = os.path.join(OUT_DIR, "content")
 os.makedirs(CONTENT_DIR, exist_ok=True)
@@ -27,6 +27,7 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 TRACKER_ANNOUNCE = os.environ.get("TRACKER_ANNOUNCE", "wss://webtorrent-tracker.onrender.com")
 DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
+STUN_SERVERS = os.environ.get("STUN_SERVERS", '"stun:relay.socket.dev:443", "stun:global.stun.twilio.com:3478"')
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -56,8 +57,7 @@ HTML_TEMPLATE = """
     "iceServers": [
       {
         "urls": [
-          "stun:relay.socket.dev:443",
-          "stun:global.stun.twilio.com:3478"
+          __STUN_SERVERS__
         ]
       }
     ],
@@ -147,7 +147,7 @@ def create_webtorrent_files(file: str) -> str:
             f.write(md5)
     if not os.path.exists(torrent_path):
         assert TRACKER_ANNOUNCE
-        cmd = f'mktorrent "{file}" -a {TRACKER_ANNOUNCE} -l 17 -o "{torrent_path}"'
+        cmd = f'mktorrent "{file}" -a {TRACKER_ANNOUNCE} -l {CHUNK_FACTOR} -o "{torrent_path}"'
         print(f"Running: {cmd}")
         os.system(cmd)
         assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"
@@ -156,6 +156,7 @@ def create_webtorrent_files(file: str) -> str:
         webseed = f"{DOMAIN_NAME}/content/{os.path.basename(file)}"
         html = HTML_TEMPLATE.replace("__TORRENT_URL__", torrent_id)
         html = html.replace("__WEBSEED__", webseed)
+        html = html.replace("__STUN_SERVERS__", STUN_SERVERS)
         with open(html_path, encoding="utf-8", mode="w") as f:
             f.write(html)
         assert os.path.exists(html_path), f"Missing {html_path}"
