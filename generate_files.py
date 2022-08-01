@@ -196,8 +196,10 @@ for movie_file in files:
         f"""
             <li>
               <h3><a href="{os.path.basename(iframe_src)}">{os.path.basename(iframe_src)}</a></h3>
-              <li><a href="{os.path.basename(movie_file)}">{f"{DOMAIN_NAME}/content/{os.path.basename(movie_file)}"}</a></li>
-              <li><a href="{os.path.basename(torrent_path)}">{os.path.basename(torrent_path)}</a></li>
+              <ul>
+                <li><a href="{os.path.basename(movie_file)}">{f"{DOMAIN_NAME}/content/{os.path.basename(movie_file)}"}</a></li>
+                <li><a href="{os.path.basename(torrent_path)}">{os.path.basename(torrent_path)}</a></li>
+              </ul>
             </li>
         """)
     except Exception as e:
