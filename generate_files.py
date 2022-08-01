@@ -2,7 +2,6 @@
 Service generates webtorrent files and 
 """
 import os
-import subprocess
 import hashlib
 import time
 import sys
@@ -11,11 +10,9 @@ import argparse
 
 DEFAULT_DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
 DEFAULT_OUT_DIR = os.environ.get("DATA_DIR", "/var/data")
-DEFAULT_CONTENT_DIR = os.path.join(DEFAULT_OUT_DIR, "content")
 
 parser = argparse.ArgumentParser("Generate webtorrent files.")
 parser.add_argument("--domain", help="Domain name", default=DEFAULT_DOMAIN_NAME)
-parser.add_argument("--content_dir", help="Directory where mp4's are found", default=DEFAULT_CONTENT_DIR)
 parser.add_argument("--output_dir", help="Directory where webtorrent files are generated", default=DEFAULT_OUT_DIR)
 args = parser.parse_args()
 
@@ -23,8 +20,8 @@ args = parser.parse_args()
 # DATA_DIR/content - contains *.mp4 or *.webm files
 # DATA_DIR - contains the generated files
 
-CONTENT_DIR = args.content_dir
 OUT_DIR = args.output_dir
+CONTENT_DIR = os.path.join(OUT_DIR, "content")
 os.makedirs(CONTENT_DIR, exist_ok=True)
 os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -134,17 +131,16 @@ def get_files(file: str) -> str:
     filename = os.path.basename(file)
     md5file = os.path.join(OUT_DIR, f"{filename}.md5")
     torrent_path = os.path.join(OUT_DIR, filename + ".torrent")
-    magnet_path = os.path.join(torrent_path + ".magnet.txt")
     html_path = os.path.join(torrent_path + ".html")
-    return md5file, torrent_path, magnet_path, html_path
+    return md5file, torrent_path, html_path
 
 def create_webtorrent_files(file: str) -> str:
-    md5file, torrent_path, magnet_path, html_path = get_files(file)
+    md5file, torrent_path, html_path = get_files(file)
     # Generate the md5 file
     md5 = filemd5(file)
     if not os.path.exists(md5file) or md5 != open(md5file).read():
         print(f"MD5 mismatch for {file}")
-        for f in [md5file, torrent_path, magnet_path, html_path]:
+        for f in [md5file, torrent_path, html_path]:
             if os.path.exists(f):
                 os.remove(f)
         with open(md5file, "w") as f:
@@ -155,28 +151,7 @@ def create_webtorrent_files(file: str) -> str:
         print(f"Running: {cmd}")
         os.system(cmd)
         assert os.path.exists(torrent_path), f"Missing expected {torrent_path}"
-    if not os.path.exists(magnet_path):
-        # Now create the magnet file
-        cmd = f'webtorrent-hybrid seed "{file}" -q'
-        print(f"Running: {cmd}")
-        proc = subprocess.Popen(
-            cmd,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
-        )
-        # Wait for the first line to appear from stdout
-        print("Waiting for magnet url")
-        magneturi = proc.stdout.readline().strip()
-        print(f"Got magnet url: {magneturi}")
-        proc.kill()
-        # Write the magnet file
-        with open(magnet_path, encoding="utf-8", mode="w") as f:
-            f.write(magneturi)
-        assert os.path.exists(magnet_path), f"Missing {magnet_path}"
-    if not os.path.exists(html_path) and os.path.exists(magnet_path):
-        magneturi = open(magnet_path, encoding="utf-8", mode="r").read().strip()
+    if not os.path.exists(html_path):
         torrent_id = f"{DOMAIN_NAME}/{os.path.basename(torrent_path)}"
         webseed = f"{DOMAIN_NAME}/content/{os.path.basename(file)}"
         html = HTML_TEMPLATE.replace("__TORRENT_URL__", torrent_id)
