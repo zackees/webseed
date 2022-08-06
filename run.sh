@@ -1,6 +1,6 @@
-set -e
 cp ./README.md $DATA_DIR/README.md
 rm $DATA_DIR/*.torrent* && rm  $DATA_DIR/*.md5
+set -e
 # --cors is required for webseed to work. Allow * and range requests
 # are explicitly set.
 pm2 start "http-server $DATA_DIR -p 80 --cors='*' -c-1"

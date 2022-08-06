@@ -5,114 +5,45 @@ import os
 import hashlib
 import time
 import sys
+import shutil
 
 # Directory structure is
-# DATA_DIR/content - contains *.mp4 or *.webm files
-# DATA_DIR - contains the generated files
+# $DATA_DIR/content - contains *.mp4 or *.webm files
+# $DATA_DIR - contains the generated files
 CHUNK_FACTOR = 17  # 128KB, or n^17
 OUT_DIR = os.environ.get("DATA_DIR", "/var/data")
 CONTENT_DIR = os.path.join(OUT_DIR, "content")
 os.makedirs(CONTENT_DIR, exist_ok=True)
 os.makedirs(OUT_DIR, exist_ok=True)
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+HTML_TEMPLATE = open(os.path.join(HERE, "template.html"),
+                     encoding="utf-8").read()
+
+# Copy webtorrent.zach.min.js to the output directory
+WEBTORRENT_JS = os.path.join(HERE, "webtorrent.zach.min.js")
+WEBTORRENT_JS_OUT = os.path.join(OUT_DIR, "webtorrent.zach.min.js")
+
+if not os.path.exists(WEBTORRENT_JS_OUT):
+    shutil.copyfile(WEBTORRENT_JS, WEBTORRENT_JS_OUT)
+else:
+    WEBTORRENT_JS_STR = open(WEBTORRENT_JS, encoding="utf-8", mode="r").read()
+    WEBTORRENT_OUT_JS_STR = open(
+        WEBTORRENT_JS_OUT, encoding="utf-8", mode="r").read()
+    if WEBTORRENT_JS_STR != WEBTORRENT_OUT_JS_STR:
+        print(f"{WEBTORRENT_JS_OUT} is out of date")
+        shutil.copyfile(WEBTORRENT_JS, WEBTORRENT_JS_OUT)
+
 TRACKER_ANNOUNCE_LIST = [
-  "wss://webtorrent-tracker.onrender.com",
-  "wss://tracker.btorrent.xyz"
+    "wss://webtorrent-tracker.onrender.com",
+    "wss://tracker.btorrent.xyz"
 ]
-DOMAIN_NAME = os.environ.get("DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
-STUN_SERVERS = os.environ.get("STUN_SERVERS", '"stun:relay.socket.dev:443", "stun:global.stun.twilio.com:3478"')
-
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-
-<style>
-  video {
-    width: 100%;
-    height: 100%;
-  }
-
-</style>
-
-<body>
-  <section>
-    <h1 id="info">Movie player loading....</h1>
-    <div id="content"></div>
-  </section>
-</body>
-
-<script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
-<script>
-  // Enable WebTorrent debugging for now.
-  localStorage.debug = '*'
-
-  const rtcConfig = {
-    "iceServers": [
-      {
-        "urls": [
-          __STUN_SERVERS__
-        ]
-      }
-    ],
-    "sdpSemantics": "unified-plan",
-    "bundlePolicy": "max-bundle",
-    "iceCandidatePoolsize": 1
-  }
-
-  const WEBTORRENT_CONFIG = {
-    tracker: {
-      rtcConfig
-    }
-  }
-
-  // EXPERIMENT, does this play better with other clients?
-  // const client = new WebTorrent()
-  const client = new WebTorrent(WEBTORRENT_CONFIG)
-  // get the current time
-  const time = new Date().getTime()
-
-  const TORRENT_URL = '__TORRENT_URL__'
-  const WEBSEED = '__WEBSEED__'
-  const torrent = client.add(TORRENT_URL, () => {
-    console.log('ON TORRENT STARTED')
-  })
-
-  console.log("created torrent")
-
-  /*
-  torrent.on('warning', console.warn)
-  torrent.on('error', console.error)
-  torrent.on('download', console.log)
-  torrent.on('upload', console.log)
-  */
-
-  torrent.on('warning', (a) => { console.warn(`warning: ${a}`) })
-  torrent.on('error', (a) => { console.error(`error: ${a}`) })
-  //torrent.on('download', (a) => { console.log(`download: ${a}`) })
-  //torrent.on('upload', (a) => { console.log(`upload: ${a}`) })
+DOMAIN_NAME = os.environ.get(
+    "DOMAIN_NAME", "https://webtorrent-webseed.onrender.com")
+STUN_SERVERS = os.environ.get(
+    "STUN_SERVERS", '"stun:relay.socket.dev:443", "stun:global.stun.twilio.com:3478"')
 
 
-  torrent.on('ready', () => {
-    torrent.addWebSeed(WEBSEED)
-    document.getElementById("info").innerHTML = "Movie name: " + torrent.name
-    console.log('Torrent loaded!')
-    console.log('Torrent name:', torrent.name)
-    console.log('Found at:', new Date().getTime() - time, " in the load")
-    console.log(`Files:`)
-    torrent.files.forEach(file => {
-      console.log('- ' + file.name)
-    })
-    // Torrents can contain many files. Let's use the .mp4 file
-    const file = torrent.files.find(file => file.name.endsWith('.mp4') || file.name.endsWith('.webm'))
-    // Display the file by adding it to the DOM
-    file.appendTo('body', { muted: true, autoplay: true })
-  })
-</script>
-
-</html>
-"""
-
-# import md5 lib
 def filemd5(filename):
     with open(filename, mode="rb") as f:
         d = hashlib.md5()
@@ -120,12 +51,14 @@ def filemd5(filename):
             d.update(buf)
     return d.hexdigest()
 
+
 def get_files(file: str) -> str:
     filename = os.path.basename(file)
     md5file = os.path.join(OUT_DIR, f"{filename}.md5")
     torrent_path = os.path.join(OUT_DIR, filename + ".torrent")
     html_path = os.path.join(torrent_path + ".html")
     return md5file, torrent_path, html_path
+
 
 def create_webtorrent_files(file: str) -> str:
     md5file, torrent_path, html_path = get_files(file)
@@ -157,7 +90,6 @@ def create_webtorrent_files(file: str) -> str:
     return html_path, torrent_path
 
 
-
 # Scan DATA_DIR for movie files
 os.chdir(CONTENT_DIR)
 
@@ -183,7 +115,7 @@ for movie_file in files:
         iframe_src, torrent_path = create_webtorrent_files(movie_file)
         assert os.path.exists(iframe_src), f"Missing {iframe_src}, skipping"
         html_str += (
-        f"""
+            f"""
             <li>
               <h3><a href="{os.path.basename(iframe_src)}">{os.path.basename(iframe_src)}</a></h3>
               <ul>
