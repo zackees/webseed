@@ -18,6 +18,7 @@
 
 <script src="webtorrent.zach.min.js"></script>
 <script>
+  const AGGRESSIVE = true;
   // Enable WebTorrent debugging for now.
   localStorage.debug = '*'
 
@@ -136,21 +137,27 @@
   torrent.on('ready', () => {
     console.log('torrent ready')
 
-    // Warning! This relies on patched webtorrent ICECOMPLETE_TIMEOUT=1000
-    setTimeout(() => {
-      if (downloadedBytes === 0 && !webseedAdded) {
-        console.log('Adding webseed because client choked for 7 seconds.')
-        addWebSeed()
-      }
-    }, 7000)
+    if (AGGRESSIVE) {
+      console.log("Aggressive mode is set, so adding webseed now.")
+      addWebSeed()
+    } else {
+      // Warning! This relies on patched webtorrent ICECOMPLETE_TIMEOUT=1000
+      setTimeout(() => {
+        if (downloadedBytes === 0 && !webseedAdded) {
+          console.log('Adding webseed because client choked for 7 seconds.')
+          addWebSeed()
+        }
+      }, 7000)
 
-    setTimeout(() => {
-      const oneMegaByte = 1024 * 512
-      if (downloadedBytes < oneMegaByte && !webseedAdded) {
-        console.log('Adding webseed because client could download fast enough after 10 seconds.')
-        addWebSeed()
-      }
-    }, 12000)
+      setTimeout(() => {
+        const oneMegaByte = 1024 * 512
+        if (downloadedBytes < oneMegaByte && !webseedAdded) {
+          console.log('Adding webseed because client could download fast enough after 10 seconds.')
+          addWebSeed()
+        }
+      }, 12000)
+    }
+
 
     //document.getElementById('info').innerHTML = 'Movie name: ' + torrent.name
     console.log('Torrent loaded!')
